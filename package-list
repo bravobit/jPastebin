@@ -1,0 +1,7 @@
+org.jpaste
+org.jpaste.exceptions
+org.jpaste.pastebin
+org.jpaste.pastebin.account
+org.jpaste.pastebin.exceptions
+org.jpaste.utils.web
+org.jpaste.utils.xml
