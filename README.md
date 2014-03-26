@@ -42,7 +42,7 @@ System.out.println(Pastebin.pastePaste(developerKey, contents, title));
 ```
 ##### More examples
 
-You can find more advanced example in the [examples package](https://github.com/BrianBB/jPastebin/tree/master/examples)
+You can find more advanced examples in the [examples package](https://github.com/BrianBB/jPastebin/tree/master/examples)
 
 ### Issues
 
