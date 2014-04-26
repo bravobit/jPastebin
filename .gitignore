@@ -1,6 +1,3 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
+# build folder in root
+/build/
+/.gradle
