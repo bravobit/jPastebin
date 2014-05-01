@@ -1,6 +1,11 @@
-*.class
+# build folder in root
+/build/
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Maven output folder
+/target
+
+# Eclipse project files
+.classpath
+.project
+.settings/
+
