@@ -7,7 +7,7 @@ import java.net.URL;
  * An representation of an abstract PasteLink
  * 
  * <p>
- * An AbstractPasteResult holds the link/URL to a paste.
+ * An AbstractPasteLink holds the link/URL to a paste.
  * </p>
  * 
  * @author Brian B
