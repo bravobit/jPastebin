@@ -214,7 +214,7 @@ public class Pastebin {
      */
     public static PastebinLink[] getMostRecent(Post post) throws ParseException {
         String url = API_SCRAPING_LINK;
-        if (post != null) {
+        if (post != null && !post.getPost().isEmpty()) {
             url += "?" + post.getPost();
 
         }
