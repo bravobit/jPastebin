@@ -39,20 +39,20 @@ public class Pastebin {
     /**
      * Used to interact with the pastebin API
      */
-    public static final String API_POST_LINK = "http://pastebin.com/api/api_post.php";
+    public static final String API_POST_LINK = "https://pastebin.com/api/api_post.php";
     /**
      * Used for fetching an user session id
      */
-    public static final String API_LOGIN_LINK = "http://pastebin.com/api/api_login.php";
+    public static final String API_LOGIN_LINK = "https://pastebin.com/api/api_login.php";
 
     /**
      * Scraping api. Must be lifetime pro in otrder to use it.
      */
-    public static final String API_SCRAPING_LINK = "http://pastebin.com/api_scraping.php";
+    public static final String API_SCRAPING_LINK = "https://pastebin.com/api_scraping.php";
 
     /**
      * Fetches a paste text from pastebin
-     * 
+     *
      * @param pasteKey
      *            the unique paste key
      * @return contents of the paste

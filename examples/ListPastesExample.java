@@ -1,5 +1,3 @@
-package examples;
-
 import org.jpaste.pastebin.PastebinLink;
 import org.jpaste.pastebin.account.PastebinAccount;
 import org.jpaste.pastebin.exceptions.LoginException;

@@ -1,5 +1,3 @@
-package examples;
-
 import org.jpaste.pastebin.Pastebin;
 import org.jpaste.pastebin.PastebinLink;
 import org.jpaste.pastebin.exceptions.ParseException;
@@ -27,7 +25,7 @@ public class MostRecentExample {
         post.put("lang", "java");
         PastebinLink[] pastebinLinkJava = Pastebin.getMostRecent(post);
         System.out.println(pastebinLinkJava.length);
-        
+
         for (PastebinLink pbl : pastebinLinkJava) {
             System.out.println(pbl.getPaste().getPasteFormat());
         }

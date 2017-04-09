@@ -1,5 +1,3 @@
-package examples;
-
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.PastebinLink;
 import org.jpaste.pastebin.account.PastebinAccount;
@@ -13,7 +11,7 @@ import org.jpaste.pastebin.exceptions.ParseException;
  * @author Brian B
  * 
  */
-public class DeletePastExample {
+public class DeletePasteExample {
 
 	public static void main(String[] args) throws LoginException, ParseException, PasteException {
 		String[] credentials = { "YOUR USERNAME HERE", "YOUR PASSWORD HERE" };
