@@ -216,8 +216,8 @@ public class Pastebin {
         String url = API_SCRAPING_LINK;
         if (post != null && !post.getPost().isEmpty()) {
             url += "?" + post.getPost();
-
         }
+
         String response = Web.getContents(url);
 
         if (response == null || response.isEmpty()
@@ -269,4 +269,4 @@ public class Pastebin {
         return null;
     }
 
-    }
+}
