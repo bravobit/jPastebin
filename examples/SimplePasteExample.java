@@ -1,5 +1,3 @@
-package examples;
-
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.Pastebin;
 
