@@ -22,6 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -44,11 +45,14 @@ public class Pastebin {
      * Used for fetching an user session id
      */
     public static final String API_LOGIN_LINK = "https://pastebin.com/api/api_login.php";
-
     /**
      * Scraping api. Must be lifetime pro in otrder to use it.
      */
     public static final String API_SCRAPING_LINK = "https://pastebin.com/api_scraping.php";
+    /**
+     * Scrape paste metadata link. Must be pro lifetime in order to use it.
+     */
+    public static final String SCRAPE_PASTE_METADATA_URL = "https://pastebin.com/api_scrape_item_meta.php?i=";
 
     /**
      * Fetches a paste text from pastebin
@@ -195,22 +199,25 @@ public class Pastebin {
 
         }
 
-        throw new ParseException("Failed to parse pastes: " + response);
+        throw new ParseException("Failed to parse paste: " + response);
     }
 
     /**
      * Gets the most recent pastes. In order to use it, it's necessary to have a
-     * <i>lifetime pro</i> account and white-list your IP. Se more on
+     * <i><a href="https://pastebin.com/pro">pro</a></i> account and white-list your IP. Se more on
      * <a href="https://pastebin.com/api_scraping_faq">Pastebin Scraping Api</a>
-     * 
-     * Note: unfortunably, it's not possible to get the number of hits.
-     * 
-     * The options for the post are: limit: up to 500. default is 50. lang: any
-     * of the syntaxes allowed for Pastebin.
-     * 
+     *
+     * The options for the post are:
+     * <ul>
+     * <li>limit: up to 250 (default is 50)</li>
+     * <li>lang: <a href="https://pastebin.com/languages">all the pastebin accepted formates</a></li>
+     * </ul>
+     *
+     * @author Felipe
      * @param post
      *            the <code>Post</code> with the options
      * @return the pastes.
+     * @throws ParseException
      */
     public static PastebinLink[] getMostRecent(Post post) throws ParseException {
         String url = API_SCRAPING_LINK;
@@ -225,29 +232,11 @@ public class Pastebin {
             throw new ParseException("Failed to parse pastes: " + response);
         }
 
-        ArrayList<Object> listData = getJSonData(response);
+        ArrayList<Map<String, Object>> listData = getListJSonData(response);
 
         ArrayList<PastebinLink> listPastebinLink = new ArrayList<>(listData.size());
-        for (Object object : listData) {
-            Map<String, Object> tempMap = (Map<String, Object>) object;
-            PastebinPaste pastebinPaste = new PastebinPaste();
-            pastebinPaste.setPasteFormat(tempMap.get("syntax").toString());
-            String pasteTitle = tempMap.get("title").toString();
-            pastebinPaste.setPasteTitle(pasteTitle == null ? "" : pasteTitle);
-            long pasteExpireDate = Long.parseLong(tempMap.get("expire").toString());
-            long pasteDate = Long.parseLong(tempMap.get("date").toString());
-            pastebinPaste.setPasteExpireDate(pasteExpireDate == 0L ? PasteExpireDate.NEVER
-                    : PasteExpireDate.getExpireDate((int) (pasteExpireDate - pasteDate)));
-            pastebinPaste.setVisibility(PastebinPaste.VISIBILITY_PUBLIC);
-            // All the pastes retrieved from this api are public.
-
-            PastebinLink pastebinLink = null;
-            try {
-                pastebinLink = new PastebinLink(pastebinPaste, new URL(tempMap.get("full_url").toString()),
-                        new Date(pasteDate * 1000));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+        for (Map<String, Object> tempMap : listData) {
+            PastebinLink pastebinLink = jSonMapToPastebinLink(tempMap);
 
             if (pastebinLink != null) {
                 listPastebinLink.add(pastebinLink);
@@ -257,16 +246,91 @@ public class Pastebin {
         return listPastebinLink.toArray(new PastebinLink[listPastebinLink.size()]);
     }
 
-    private static ArrayList<Object> getJSonData(String response) {
+    /**
+     * Converts the <code>Map</code> with the json informations into a
+     * <code>PastebinLink</code>.
+     * 
+     * Important: can't retrieve visibility and, once most of the technics from
+     * API only alow parse public pasts, the resultant paste is tagged as
+     * Public.
+     * 
+     * @author Felipe
+     * @param tempMap
+     *            the Json Map
+     * @return PastebinLink with all the informations
+     */
+    private static PastebinLink jSonMapToPastebinLink(Map<String, Object> tempMap) {
+        PastebinPaste pastebinPaste = new PastebinPaste();
+        pastebinPaste.setPasteFormat(tempMap.get("syntax").toString());
+        String pasteTitle = tempMap.get("title").toString();
+        pastebinPaste.setPasteTitle(pasteTitle == null ? "" : pasteTitle);
+        pastebinPaste.setPasteAuthor(tempMap.get("user").toString());
+        long pasteExpireDate = Long.parseLong(tempMap.get("expire").toString());
+        long pasteDate = Long.parseLong(tempMap.get("date").toString());
+        pastebinPaste.setPasteExpireDate(pasteExpireDate == 0L ? PasteExpireDate.NEVER
+                : PasteExpireDate.getExpireDate((int) (pasteExpireDate - pasteDate)));
+        pastebinPaste.setVisibility(PastebinPaste.VISIBILITY_PUBLIC);
+        // All the pastes retrieved from this api are public.
+
+        PastebinLink pastebinLink = null;
+        try {
+            pastebinLink = new PastebinLink(pastebinPaste, new URL(tempMap.get("full_url").toString()),
+                    new Date(pasteDate * 1000));
+            String hits = tempMap.get("hits").toString();
+            pastebinLink.setHits(hits != null && !hits.isEmpty() ? Integer.parseInt(hits) : 0);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return pastebinLink;
+    }
+
+    /**
+     * Returns the JSON response as a <code>ArrayList</code> of /code>Map</code>
+     * 
+     * @author Felipe
+     * @param response
+     *            the pastebin JSON response
+     * @return the list of maps with the content
+     */
+    private static ArrayList<Map<String, Object>> getListJSonData(String response) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            ArrayList<Object> data = mapper.readValue(response, ArrayList.class);
+            ArrayList<Map<String, Object>> data = mapper.readValue(response,
+                    new TypeReference<ArrayList<Map<String, Object>>>() {
+                    });
             return data;
         } catch (IOException e) {
-
             e.printStackTrace();
         }
         return null;
     }
 
+    /**
+     * Get all available informations from a paste, not only its contents,
+     * generating a <code>PastebinLink</code>. Part of the
+     * <a href="https://pastebin.com/api_scraping_faq">Scraping API</a>. Must be
+     * <a href="https://pastebin.com/pro">Pro user</a> to use. The pastebinKey is the 7-8 size identifier of any
+     * paste.
+     * 
+     * @author Felipe
+     * @param key
+     *            the pastebin key
+     * @return the <code>PastebinLink</code> with the informations.
+     * @throws ParseException
+     */
+    public static PastebinLink getPaste(String key) throws ParseException {
+        String url = SCRAPE_PASTE_METADATA_URL + key;
+        String response = Web.getContents(url);
+
+        if (response == null || response.isEmpty()
+                || !(response.charAt(0) == '[' && response.charAt(response.length() - 1) == ']')) {
+            throw new ParseException("Failed to parse paste: " + response);
+        }
+
+        ArrayList<Map<String, Object>> listData = getListJSonData(response);
+
+        Map<String, Object> tempMap = listData.get(0);
+        PastebinLink pastebinLink = jSonMapToPastebinLink(tempMap);
+        return pastebinLink;
+    }
 }
