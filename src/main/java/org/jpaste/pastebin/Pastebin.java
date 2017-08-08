@@ -204,13 +204,15 @@ public class Pastebin {
 
     /**
      * Gets the most recent pastes. In order to use it, it's necessary to have a
-     * <i><a href="https://pastebin.com/pro">pro</a></i> account and white-list your IP. Se more on
+     * <i><a href="https://pastebin.com/pro">pro</a></i> account and white-list
+     * your IP. Se more on
      * <a href="https://pastebin.com/api_scraping_faq">Pastebin Scraping Api</a>
      *
      * The options for the post are:
      * <ul>
      * <li>limit: up to 250 (default is 50)</li>
-     * <li>lang: <a href="https://pastebin.com/languages">all the pastebin accepted formates</a></li>
+     * <li>lang: <a href="https://pastebin.com/languages">all the pastebin
+     * accepted formates</a></li>
      * </ul>
      *
      * @author Felipe
@@ -264,7 +266,8 @@ public class Pastebin {
         pastebinPaste.setPasteFormat(tempMap.get("syntax").toString());
         String pasteTitle = tempMap.get("title").toString();
         pastebinPaste.setPasteTitle(pasteTitle == null ? "" : pasteTitle);
-        pastebinPaste.setPasteAuthor(tempMap.get("user").toString());
+        String pasteAuthor = tempMap.get("user").toString();
+        pastebinPaste.setPasteAuthor(pasteAuthor == null ? "" : pasteAuthor);
         long pasteExpireDate = Long.parseLong(tempMap.get("expire").toString());
         long pasteDate = Long.parseLong(tempMap.get("date").toString());
         pastebinPaste.setPasteExpireDate(pasteExpireDate == 0L ? PasteExpireDate.NEVER
@@ -309,8 +312,8 @@ public class Pastebin {
      * Get all available informations from a paste, not only its contents,
      * generating a <code>PastebinLink</code>. Part of the
      * <a href="https://pastebin.com/api_scraping_faq">Scraping API</a>. Must be
-     * <a href="https://pastebin.com/pro">Pro user</a> to use. The pastebinKey is the 7-8 size identifier of any
-     * paste.
+     * <a href="https://pastebin.com/pro">Pro user</a> to use. The pastebinKey
+     * is the 7-8 size identifier of any paste.
      * 
      * @author Felipe
      * @param key
