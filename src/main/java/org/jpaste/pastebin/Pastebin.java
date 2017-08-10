@@ -233,12 +233,15 @@ public class Pastebin {
                 || !(response.charAt(0) == '[' && response.charAt(response.length() - 2) == ']')) {
             throw new ParseException("Failed to parse pastes: " + response);
         }
-
         ArrayList<Map<String, Object>> listData = getListJSonData(response);
-
-        ArrayList<PastebinLink> listPastebinLink = new ArrayList<>(listData.size());
+        ArrayList<PastebinLink> listPastebinLink = new ArrayList<PastebinLink>();
         for (Map<String, Object> tempMap : listData) {
-            PastebinLink pastebinLink = jSonMapToPastebinLink(tempMap);
+            PastebinLink pastebinLink = null;
+            try {
+                pastebinLink = jSonMapToPastebinLink(tempMap);
+            } catch (MalformedURLException e) {
+                
+            }
 
             if (pastebinLink != null) {
                 listPastebinLink.add(pastebinLink);
@@ -260,8 +263,10 @@ public class Pastebin {
      * @param tempMap
      *            the Json Map
      * @return PastebinLink with all the informations
+     * @throws MalformedURLException
+     *             if there are problems with the paste's url
      */
-    private static PastebinLink jSonMapToPastebinLink(Map<String, Object> tempMap) {
+    private static PastebinLink jSonMapToPastebinLink(Map<String, Object> tempMap) throws MalformedURLException {
         PastebinPaste pastebinPaste = new PastebinPaste();
         pastebinPaste.setPasteFormat(tempMap.get("syntax").toString());
         String pasteTitle = tempMap.get("title").toString();
@@ -279,10 +284,11 @@ public class Pastebin {
         try {
             pastebinLink = new PastebinLink(pastebinPaste, new URL(tempMap.get("full_url").toString()),
                     new Date(pasteDate * 1000));
-            String hits = tempMap.get("hits").toString();
-            pastebinLink.setHits(hits != null && !hits.isEmpty() ? Integer.parseInt(hits) : 0);
+            Object hits = tempMap.get("hits");
+            String hitsText = hits == null ? "" : hits.toString();
+            pastebinLink.setHits(!hitsText.isEmpty() ? Integer.parseInt(hitsText) : 0);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pastebinLink;
     }
@@ -333,7 +339,11 @@ public class Pastebin {
         ArrayList<Map<String, Object>> listData = getListJSonData(response);
 
         Map<String, Object> tempMap = listData.get(0);
-        PastebinLink pastebinLink = jSonMapToPastebinLink(tempMap);
+        PastebinLink pastebinLink = null;
+        try {
+            pastebinLink = jSonMapToPastebinLink(tempMap);
+        } catch (MalformedURLException e) {
+        }
         return pastebinLink;
     }
 }
