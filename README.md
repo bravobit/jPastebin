@@ -25,7 +25,7 @@ This API can do much more than just generating pastes.
 ### Documentation
 
 This API wrapper is fully documentated!
-You can find the javadoc [here](http://brianbb.github.io/jPastebin/).
+You can find the javadoc [here](http://bravobit.github.io/jPastebin/).
 
 ### Examples
 
