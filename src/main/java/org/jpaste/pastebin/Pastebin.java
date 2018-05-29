@@ -48,11 +48,11 @@ public class Pastebin {
     /**
      * Scraping api. Must be lifetime pro in otrder to use it.
      */
-    public static final String API_SCRAPING_LINK = "https://pastebin.com/api_scraping.php";
+    public static final String API_SCRAPING_LINK = "https://scrape.pastebin.com/api_scraping.php";
     /**
      * Scrape paste metadata link. Must be pro lifetime in order to use it.
      */
-    public static final String SCRAPE_PASTE_METADATA_URL = "https://pastebin.com/api_scrape_item_meta.php?i=";
+    public static final String SCRAPE_PASTE_METADATA_URL = "https://scrape.pastebin.com/api_scrape_item_meta.php";
 
     /**
      * Fetches a paste text from pastebin
@@ -230,7 +230,7 @@ public class Pastebin {
         String response = Web.getContents(url);
 
         if (response == null || response.isEmpty()
-                || !(response.charAt(0) == '[' && response.charAt(response.length() - 2) == ']')) {
+                || !(response.charAt(0) == '[' && response.charAt(response.length() - 1) == ']')) {
             throw new ParseException("Failed to parse pastes: " + response);
         }
         ArrayList<Map<String, Object>> listData = getListJSonData(response);
